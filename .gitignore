@@ -1,0 +1,7 @@
+# Ignore project files
+/.vs/
+/.vscode/
+/.idea/
+
+# Ignore generated folders
+/out/*
