@@ -28,6 +28,44 @@ MACRO(SUBFOLDEREXITS doesexist curdir foldertosearch)
 ENDMACRO()
 #Macros End
 
+#Function Start
+function(P_Add_Dependency_And_Link_Target Arg_Target)
+    #Add Dependency Start
+        #
+        ##OpenSSL Specific Start
+            ##
+            if(P_OpenSSL_Should_Build)
+                add_dependencies(${Arg_Target} P_OPENSSL_BUILD_COMMAND_VAR)
+            endif()
+            ##
+        ##OpenSSL Specific End
+        #
+    #Add Dependency End
+    
+    #Library Linking Start
+        #
+        ##OpenSSL Specific Start
+            ##
+            if(True)
+                if(WIN32)
+                    target_link_libraries(${Arg_Target} ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_1}.lib)
+                    target_link_libraries(${Arg_Target} ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_2}.lib)
+                    if(P_OpenSSL_Sould_Link_crypt32)
+                        target_link_libraries(${Arg_Target} crypt32.lib)
+                    endif()
+                endif()
+                if(APPLE)
+                    target_link_libraries(${Arg_Target} ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_1}.a)
+                    target_link_libraries(${Arg_Target} ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_2}.a)
+                endif()
+            endif()
+            ##
+        ##OpenSSL Specific End
+        #
+    #Library Linking End
+endfunction()
+#Function End
+
 #Global Vars Start
     #
     ##Boost Specific Start
@@ -177,30 +215,6 @@ ENDMACRO()
     #
     include_directories(${BOOST_ROOT}/libs/beast/example)
     add_executable(simple_example main.cpp)
-    if(P_OpenSSL_Should_Build)
-        add_dependencies(simple_example P_OPENSSL_BUILD_COMMAND_VAR)
-    endif()
+    P_Add_Dependency_And_Link_Target(simple_example)
     #
 #Example Files ONLY FOR TESTING End
-
-#Library Linking Start
-    #
-    ##OpenSSL Specific Start
-        ##
-        IF(True)
-            if(WIN32)
-                target_link_libraries(simple_example ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_1}.lib)
-                target_link_libraries(simple_example ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_2}.lib)
-                if(P_OpenSSL_Sould_Link_crypt32)
-                    target_link_libraries(simple_example crypt32.lib)
-                endif()
-            endif()
-            if(APPLE)
-                target_link_libraries(simple_example ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_1}.a)
-                target_link_libraries(simple_example ${P_OpenSSL_Lib_Dir}/${P_OpenSSL_Lib_Name_2}.a)
-            endif()
-        ENDIF()
-        ##
-    ##OpenSSL Specific End
-    #
-#Library Linking End
